@@ -20,19 +20,20 @@ namespace MenuLightColorChanger.HarmonyPatches
             var css = MenuLightColorChanger.colorSchemesSettings;
             var colorManager = MenuLightColorChanger.colorManager;
             var cs = css.overrideDefaultColors ? css.GetSelectedColorScheme() : colorManager.GetField<ColorSchemeSO>("_defaultColorScheme").colorScheme;
+            Utils.AdjustColorBW(cs);
 
             var laser = ____laserPointerPrefab.GetComponent<MeshRenderer>();
             var cursor = ____cursorPrefab.GetComponent<MeshRenderer>();
 
             if (____lastControllerUsedWasRight)
             {
-                laser.material.color = cs.saberBColor.ColorWithAlpha(0.5f);
-                cursor.material.color = cs.saberBColor.ColorWithAlpha(0.5f);
+                laser.material.color = cs.saberBColor.ColorWithAlpha(laser.material.color.a);
+                cursor.material.color = cs.saberBColor.ColorWithAlpha(cursor.material.color.a);
             }
             else
             {
-                laser.material.color = cs.saberAColor.ColorWithAlpha(0.5f);
-                cursor.material.color = cs.saberAColor.ColorWithAlpha(0.5f);
+                laser.material.color = cs.saberAColor.ColorWithAlpha(laser.material.color.a);
+                cursor.material.color = cs.saberAColor.ColorWithAlpha(cursor.material.color.a);
             }
 
             Logger.log.Info("applied pointer colors");

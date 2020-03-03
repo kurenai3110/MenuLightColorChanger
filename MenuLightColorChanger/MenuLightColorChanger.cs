@@ -119,10 +119,10 @@ namespace MenuLightColorChanger
             var lightType = prePassLight.GetBasePrivateField<BloomPrePassLightTypeSO>("_lightType");
             prePassLight.SetBasePrivateField("_registeredWithLightType", lightType);
 
-            prePassLight.color = color;
+            prePassLight.color = color.ColorWithAlpha(prePassLight.color.a);
 
             var sprite = flicker.GetPrivateField<SpriteRenderer>("_flickeringSprite");
-            sprite.color = color;
+            sprite.color = color.ColorWithAlpha(sprite.color.a);
 
             flicker.Start();
 
@@ -134,7 +134,7 @@ namespace MenuLightColorChanger
 
                     ParticleSystem.MinMaxGradient particleColor = new ParticleSystem.MinMaxGradient();
                     particleColor.mode = ParticleSystemGradientMode.Color;
-                    particleColor.color = color;
+                    particleColor.color = color.ColorWithAlpha(particleColor.color.a);
                     ParticleSystem.MainModule main = particle.main;
                     main.startColor = particleColor;
                 }
@@ -158,9 +158,9 @@ namespace MenuLightColorChanger
                     prePassLight.SetBasePrivateField("_registeredWithLightType", lightType);
 
                     if (t.name == "BATNeon")
-                        prePassLight.color = cs.environmentColor0;
+                        prePassLight.color = cs.environmentColor0.ColorWithAlpha(prePassLight.color.a);
                     if (t.name == "SaberNeon")
-                        prePassLight.color = cs.environmentColor1;
+                        prePassLight.color = cs.environmentColor1.ColorWithAlpha(prePassLight.color.a);
                 }
 
                 if (t.name == "BatLogo" || t.name == "SaberLogo")
@@ -168,10 +168,10 @@ namespace MenuLightColorChanger
                     var sprite = t.GetComponent<SpriteRenderer>();
 
                     if (t.name == "BatLogo")
-                        sprite.color = cs.environmentColor0;
+                        sprite.color = cs.environmentColor0.ColorWithAlpha(sprite.color.a);
 
                     if (t.name == "SaberLogo")
-                        sprite.color = cs.environmentColor1;
+                        sprite.color = cs.environmentColor1.ColorWithAlpha(sprite.color.a);
                 }
 
                 if (t.name == "EFlickering")
@@ -216,35 +216,34 @@ namespace MenuLightColorChanger
             foreach (var ct in coloredTextIcons)
             {
                 //Logger.log.Debug(ct.name);
+                Color c;
 
                 if (ct.GetType() == typeof(TextSegmentedControlCellNew))
                 {
-                    //Color c;
-                    //c = cp.GetPrivateField<Color>("_selectedTextColor");
-                    ct.SetPrivateField("_selectedTextColor", cs.environmentColor1.makeLight(0.2f));
+                    c = ct.GetPrivateField<Color>("_selectedTextColor");
+                    ct.SetPrivateField("_selectedTextColor", cs.environmentColor1.ColorWithAlpha(c.a));
                     //c = cp.GetPrivateField<Color>("_highlightTextColor");
                     //cp.SetPrivateField("_highlightTextColor", overrideColorScheme.environmentColor1);
-                    //c = cp.GetPrivateField<Color>("_selectedHighlightTextColor");
-                    ct.SetPrivateField("_selectedHighlightTextColor", cs.environmentColor1.makeLight(0.2f));
+                    c = ct.GetPrivateField<Color>("_selectedHighlightTextColor");
+                    ct.SetPrivateField("_selectedHighlightTextColor", cs.environmentColor1.ColorWithAlpha(c.a));
                 }
 
                 if (ct.GetType() == typeof(IconSegmentedControlCell))
                 {
-                    //Color c;
-                    //c = cp.GetPrivateField<Color>("_selectedIconColor");
-                    ct.SetPrivateField("_selectedIconColor", cs.environmentColor1.makeLight(0.2f));
+                    c = ct.GetPrivateField<Color>("_selectedIconColor");
+                    ct.SetPrivateField("_selectedIconColor", cs.environmentColor1.ColorWithAlpha(c.a));
                     //c = cp.GetPrivateField<Color>("_highlightIconColor");
                     //cp.SetPrivateField("_highlightIconColor", overrideColorScheme.environmentColor1);
-                    //c = cp.GetPrivateField<Color>("_selectedHighlightIconColor");
-                    ct.SetPrivateField("_selectedHighlightIconColor", cs.environmentColor1.makeLight(0.2f));
+                    c = ct.GetPrivateField<Color>("_selectedHighlightIconColor");
+                    ct.SetPrivateField("_selectedHighlightIconColor", cs.environmentColor1.ColorWithAlpha(c.a));
                 }
-
+                
                 //c = cp.GetPrivateField<Color>("_selectedBGColor");
                 //cp.SetPrivateField("_selectedBGColor", overrideColorScheme.environmentColor1);
-                //c = cp.GetPrivateField<Color>("_highlightBGColor");
-                ct.SetPrivateField("_highlightBGColor", cs.environmentColor1.makeLight(0.2f).ColorWithAlpha(0.25f));
-                //c = cp.GetPrivateField<Color>("_selectedHighlightBGColor");
-                ct.SetPrivateField("_selectedHighlightBGColor", cs.environmentColor1.makeLight(0.2f).ColorWithAlpha(0.25f));
+                c = ct.GetPrivateField<Color>("_highlightBGColor");
+                ct.SetPrivateField("_highlightBGColor", cs.environmentColor1.ColorWithAlpha(c.a));
+                c = ct.GetPrivateField<Color>("_selectedHighlightBGColor");
+                ct.SetPrivateField("_selectedHighlightBGColor", cs.environmentColor1.ColorWithAlpha(c.a));
 
 
                 ct.InvokePrivateMethod("RefreshVisuals", new object[] { });
@@ -262,10 +261,7 @@ namespace MenuLightColorChanger
 
             foreach (var ci in coloredImages)
             {
-                ci.color = cs.environmentColor1.makeLight(0.2f).ColorWithAlpha(ci.color.a);
-
-                if (ci.name == "Glow")
-                    ci.color = cs.environmentColor1.makeLight(0.1f).ColorWithAlpha(ci.color.a);
+                ci.color = cs.environmentColor1.ColorWithAlpha(ci.color.a);
             }
 
             Logger.log.Info("applied Image colors");
@@ -340,7 +336,11 @@ namespace MenuLightColorChanger
                 TMPUGUI.color = cs.environmentColor1.ColorWithAlpha(TMPUGUI.color.a);
 
                 if (TMPUGUI.transform.parent.name == "HeaderPanel")
-                    TMPUGUI.color = cs.environmentColor1.makeLight(0.294f).ColorWithAlpha(TMPUGUI.color.a);
+                {
+                    //TMPUGUI.color = cs.environmentColor1.makeLight(0.294f).ColorWithAlpha(TMPUGUI.color.a);
+                    TMPUGUI.color = cs.environmentColor1.ColorWithAlpha(TMPUGUI.color.a);
+                }
+                    
             }
             Logger.log.Info("applied TextMeshProUGUI colors");
         }
@@ -390,6 +390,7 @@ namespace MenuLightColorChanger
             bsLightManager = Resources.FindObjectsOfTypeAll<LightWithIdManager>().FirstOrDefault();
 
             var overrideColorScheme = colorSchemesSettings.overrideDefaultColors ? colorSchemesSettings.GetSelectedColorScheme() : colorManager.GetField<ColorSchemeSO>("_defaultColorScheme").colorScheme;
+            Utils.AdjustColorBW(overrideColorScheme);
 
             Logger.log.Info("selected:" + overrideColorScheme.colorSchemeName);
 
@@ -399,6 +400,8 @@ namespace MenuLightColorChanger
 
             SetLogoColors(overrideColorScheme);
             SetMenuPlayersPlaceColors(overrideColorScheme);
+
+            SetPointerColors(overrideColorScheme);
 
             SetColoredTextIconColors(overrideColorScheme);
             SetColoredImageColors(overrideColorScheme);
@@ -418,6 +421,6 @@ namespace MenuLightColorChanger
             currentColorScheme = overrideColorScheme;
 
             Logger.log.Info("applied all colors");
-        }
+        }       
     }
 }

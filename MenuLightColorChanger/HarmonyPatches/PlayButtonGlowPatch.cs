@@ -23,6 +23,7 @@ namespace MenuLightColorChanger.HarmonyPatches
                 var css = MenuLightColorChanger.colorSchemesSettings;
                 var colorManager = MenuLightColorChanger.colorManager;
                 var cs = css.overrideDefaultColors ? css.GetSelectedColorScheme() : colorManager.GetField<ColorSchemeSO>("_defaultColorScheme").colorScheme;
+                Utils.AdjustColorBW(cs);
 
                 glow.color = cs.environmentColor1.ColorWithAlpha(glow.color.a);
             }

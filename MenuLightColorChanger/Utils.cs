@@ -9,6 +9,7 @@ namespace MenuLightColorChanger
 {
     internal static class Utils
     {
+        /*
         public static Color makeLight(this Color color, float percentage)
         {
             Color new_color = color;
@@ -30,7 +31,7 @@ namespace MenuLightColorChanger
 
             return new_color;
         }
-
+        */
 
         public static void SetAnimationCurveColor(AnimationClip ac, Color color, Type type, string colorPropertyname, string relativePath)
         {
@@ -74,6 +75,35 @@ namespace MenuLightColorChanger
             }
 
             return allChildren;
+        }
+
+        //応急処置
+        public static void AdjustColorBW(ColorScheme cs)
+        {
+            if (cs.environmentColor1 == Color.black)
+                cs.SetPrivateField("_environmentColor1", new Color(0.004f, 0.004f, 0.004f, 1f));
+            if (cs.environmentColor1 == Color.white)
+                cs.SetPrivateField("_environmentColor1", new Color(0.996f, 0.996f, 0.996f, 1f));
+
+            if (cs.environmentColor0 == Color.black)
+                cs.SetPrivateField("_environmentColor0", new Color(0.004f, 0.004f, 0.004f, 1f));
+            if (cs.environmentColor0 == Color.white)
+                cs.SetPrivateField("_environmentColor0", new Color(0.996f, 0.996f, 0.996f, 1f));
+
+            if (cs.saberAColor == Color.black)
+                cs.SetPrivateField("_saberAColor", new Color(0.004f, 0.004f, 0.004f, 1f));
+            if (cs.saberAColor == Color.white)
+                cs.SetPrivateField("_saberAColor", new Color(0.996f, 0.996f, 0.996f, 1f));
+
+            if (cs.saberBColor == Color.black)
+                cs.SetPrivateField("_saberBColor", new Color(0.004f, 0.004f, 0.004f, 1f));
+            if (cs.saberBColor == Color.white)
+                cs.SetPrivateField("_saberBColor", new Color(0.996f, 0.996f, 0.996f, 1f));
+
+            if (cs.obstaclesColor == Color.black)
+                cs.SetPrivateField("_obstaclesColor", new Color(0.004f, 0.004f, 0.004f, 1f));
+            if (cs.obstaclesColor == Color.white)
+                cs.SetPrivateField("_obstaclesColor", new Color(0.996f, 0.996f, 0.996f, 1f));
         }
     }
 }
