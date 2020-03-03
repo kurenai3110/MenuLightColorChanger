@@ -37,8 +37,6 @@ namespace MenuLightColorChanger
             editColorSchemeController.didFinishEvent += ColorChangeEvent;
             editColorSchemeController.didChangeColorSchemeEvent += ColorChangeEvent;
             overrideColorsToggle.onValueChanged.AddListener(new UnityAction<bool>(ColorChangeEvent));
-
-            HarmonyPatches.SongBrowerCreateUIPatch.SongBrowerUICreated += ChangeColors;
         }
 
         static IEnumerator ChangeColorsCoroutine(float time)
@@ -258,8 +256,8 @@ namespace MenuLightColorChanger
         private static void SetColoredImageColors(ColorScheme cs)
         {
             var coloredImages = Resources.FindObjectsOfTypeAll<UnityEngine.UI.Image>()
-                .Where(image => (image.name == "Arrow" || image.name == "Icon" || image.name == "Highlight" || image.name == "Checkmark" || image.name == "Selection" || image.name == "Handle")
-                                && image.color.ColorWithAlpha(1f) != Color.white && image.color.ColorWithAlpha(1f) != Color.black || (image.name == "Glow" && image.transform.parent.name != "GlowContainer"))
+                .Where(image => (image.name == "Arrow" || image.name == "Icon" || image.name == "Highlight" || image.name == "Checkmark" || image.name == "Selection" || image.name == "Handle" || image.name == "Glow")
+                                && image.color.ColorWithAlpha(1f) != Color.white && image.color.ColorWithAlpha(1f) != Color.black)
                 .ToArray();
 
             foreach (var ci in coloredImages)

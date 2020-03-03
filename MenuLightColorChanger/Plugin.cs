@@ -46,6 +46,8 @@ namespace MenuLightColorChanger
                 config = v;
             });
             harmony = HarmonyInstance.Create(HarmonyId);
+
+            ApplyHarmonyPatches();
         }
 
         /// <summary>

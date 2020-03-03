@@ -56,11 +56,6 @@
       <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\HMUI.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
-    <Reference Include="SongBrowser, Version=6.0.4.0, Culture=neutral, processorArchitecture=MSIL">
-      <Private>False</Private>
-      <HintPath>$(BeatSaberDir)\Plugins\SongBrowser.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -125,7 +120,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="HarmonyPatches\PlayButtonGlowPatch.cs" />
-    <Compile Include="HarmonyPatches\SongBrowserCreateUIPatch.cs" />
     <Compile Include="HarmonyPatches\VRPointerPatch.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Logger.cs" />
