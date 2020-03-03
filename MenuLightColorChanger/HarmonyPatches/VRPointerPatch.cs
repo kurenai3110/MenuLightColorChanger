@@ -15,7 +15,7 @@ namespace MenuLightColorChanger.HarmonyPatches
     [HarmonyPatch("CreateLaserPointerAndLaserHit")]
     class CreateLaserPointerPatch
     {
-        static void Prefix(ref Transform ____laserPointerPrefab, ref Transform ____cursorPrefab, ref bool ____lastControllerUsedWasRight)
+        static bool Prefix(ref Transform ____laserPointerPrefab, ref Transform ____cursorPrefab, ref bool ____lastControllerUsedWasRight)
         {
             var css = MenuLightColorChanger.colorSchemesSettings;
             var colorManager = MenuLightColorChanger.colorManager;
@@ -37,6 +37,21 @@ namespace MenuLightColorChanger.HarmonyPatches
             }
 
             Logger.log.Info("applied pointer colors");
+
+            return true;
+        }
+    }
+
+    [HarmonyPatch(typeof(VRPointer))]
+    [HarmonyPatch("Awake")]
+    class AwakeLaserPointerPatch
+    {
+        static void Postfix(ref VRController ____leftVRController, ref bool ____lastControllerUsedWasRight)
+        {
+            if(____leftVRController.active == false)
+            {
+                ____lastControllerUsedWasRight = true;
+            }
         }
     }
 }

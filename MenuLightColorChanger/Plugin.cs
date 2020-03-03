@@ -102,8 +102,6 @@ namespace MenuLightColorChanger
         public void OnSceneLoaded(Scene scene, LoadSceneMode sceneMode)
         {
 
-
-
         }
 
 
@@ -111,6 +109,7 @@ namespace MenuLightColorChanger
         {
             Logger.log.Debug("OnApplicationQuit");
 
+            BSEvents.menuSceneLoadedFresh -= MenuSceneLoadedFresh;
         }
 
         /// <summary>
