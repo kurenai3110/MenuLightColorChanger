@@ -16,9 +16,7 @@ namespace MenuLightColorChanger
 {
     public class Plugin : IBeatSaberPlugin
     {
-        // TODO: Change YourGitHub to the name of your GitHub account, or use the form "com.company.project.product"
         public const string HarmonyId = "com.github.kurenai3110.MenuLightColorChanger";
-        public const string SongCoreHarmonyId = "com.kyle1413.BeatSaber.SongCore";
         internal static HarmonyInstance harmony;
         internal static string Name => "MenuLightColorChanger";
         internal static Ref<PluginConfig> config;
@@ -101,7 +99,10 @@ namespace MenuLightColorChanger
         /// <param name="sceneMode"></param>
         public void OnSceneLoaded(Scene scene, LoadSceneMode sceneMode)
         {
-
+            if(scene.name == "HealthWarning")
+            {
+                MenuLightColorChanger.ChangeColors();
+            }
         }
 
 
@@ -147,7 +148,7 @@ namespace MenuLightColorChanger
 
         private void MenuSceneLoadedFresh()
         {
-            MenuLightColorChanger.LoadResources();
+            MenuLightColorChanger.InitResources();
             MenuLightColorChanger.ChangeColors();
         }
     }

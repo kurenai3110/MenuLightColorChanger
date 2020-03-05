@@ -63,20 +63,12 @@ namespace MenuLightColorChanger
             PersistentSingleton<SharedCoroutineStarter>.instance.StartCoroutine(ChangeColorsCoroutine(0.01f));
         }
 
-        public static void LoadResources()
+        public static void InitResources()
         {
             if (isInited)
                 return;
 
             Init();
-
-            colorManager = Resources.FindObjectsOfTypeAll<ColorManager>().FirstOrDefault();
-
-            var playerDataModel = Resources.FindObjectsOfTypeAll<PlayerDataModelSO>().FirstOrDefault();
-            colorSchemesSettings = playerDataModel.playerData.colorSchemesSettings;
-
-            menuLightsManager = Resources.FindObjectsOfTypeAll<MenuLightsManager>().FirstOrDefault();
-            bsLightManager = Resources.FindObjectsOfTypeAll<LightWithIdManager>().FirstOrDefault();
 
             var colorGradientSliders = Resources.FindObjectsOfTypeAll<ColorGradientSlider>();
             foreach (var cgs in colorGradientSliders)
@@ -97,286 +89,391 @@ namespace MenuLightColorChanger
             GameObject.DestroyImmediate(editButtonObject.GetComponent<Animator>());
             GameObject.DestroyImmediate(editButtonObject.GetComponents<HoverHint>().Last());
 
-
             isInited = true;
             Logger.log.Info("initialized!");
         }
 
         private static void SetMenuEnvironmentColors(ColorScheme cs)
         {
-            var menuEnvLight3 = Resources.FindObjectsOfTypeAll<SimpleColorSO>().Where(x => x.name == "MenuEnvLight3").FirstOrDefault();
-            var menuEnvLight1 = Resources.FindObjectsOfTypeAll<SimpleColorSO>().Where(x => x.name == "MenuEnvLight1").FirstOrDefault();
+            try
+            {
+                var menuEnvLight3 = Resources.FindObjectsOfTypeAll<SimpleColorSO>().Where(x => x.name == "MenuEnvLight3").FirstOrDefault();
+                var menuEnvLight1 = Resources.FindObjectsOfTypeAll<SimpleColorSO>().Where(x => x.name == "MenuEnvLight1").FirstOrDefault();
+                if (menuEnvLight3 != null)
+                    menuEnvLight3.SetColor(cs.environmentColor1);
+                if (menuEnvLight1 != null)
+                    menuEnvLight1.SetColor(cs.environmentColor0);
+                Logger.log.Info("applied Environment colors");
 
-            menuEnvLight3.SetColor(cs.environmentColor1);
-            menuEnvLight1.SetColor(cs.environmentColor0);
-
-            Logger.log.Info("applied Environment colors");
+            }
+            catch (Exception e)
+            {
+                Logger.log.Error(e);
+            }
         }
 
         private static void SetFlickeringNeonColor(FlickeringNeonSign flicker, Color color)
         {
-            var prePassLight = flicker.GetPrivateField<TubeBloomPrePassLight>("_light");
-            var lightType = prePassLight.GetBasePrivateField<BloomPrePassLightTypeSO>("_lightType");
-            prePassLight.SetBasePrivateField("_registeredWithLightType", lightType);
-
-            prePassLight.color = color.ColorWithAlpha(prePassLight.color.a);
-
-            var sprite = flicker.GetPrivateField<SpriteRenderer>("_flickeringSprite");
-            sprite.color = color.ColorWithAlpha(sprite.color.a);
-
-            flicker.Start();
-
-            foreach (Transform child in flicker.transform)
+            try
             {
-                if (child.name.Contains("Sparks"))
-                {
-                    var particle = child.GetComponent<ParticleSystem>();
+                var prePassLight = flicker.GetPrivateField<TubeBloomPrePassLight>("_light");
+                var lightType = prePassLight.GetBasePrivateField<BloomPrePassLightTypeSO>("_lightType");
+                prePassLight.SetBasePrivateField("_registeredWithLightType", lightType);
 
-                    ParticleSystem.MinMaxGradient particleColor = new ParticleSystem.MinMaxGradient();
-                    particleColor.mode = ParticleSystemGradientMode.Color;
-                    particleColor.color = color.ColorWithAlpha(particleColor.color.a);
-                    ParticleSystem.MainModule main = particle.main;
-                    main.startColor = particleColor;
+                prePassLight.color = color.ColorWithAlpha(prePassLight.color.a);
+
+                var sprite = flicker.GetPrivateField<SpriteRenderer>("_flickeringSprite");
+                sprite.color = color.ColorWithAlpha(sprite.color.a);
+
+                flicker.Start();
+
+                foreach (Transform child in flicker.transform)
+                {
+                    if (child.name.Contains("Sparks"))
+                    {
+                        var particle = child.GetComponent<ParticleSystem>();
+
+                        ParticleSystem.MinMaxGradient particleColor = new ParticleSystem.MinMaxGradient();
+                        particleColor.mode = ParticleSystemGradientMode.Color;
+                        particleColor.color = color.ColorWithAlpha(particleColor.color.a);
+                        ParticleSystem.MainModule main = particle.main;
+                        main.startColor = particleColor;
+                    }
                 }
+            }
+            catch (Exception e)
+            {
+                Logger.log.Error(e);
             }
         }
 
         private static void SetLogoColors(ColorScheme cs)
         {
-            var logo = FindUnityObjectsHelper.GetAllGameObjectsInLoadedScenes().Find(x => x.name == "Logo");
-
-            foreach (Transform t in logo.transform)
+            try
             {
-                //Logger.log.Debug(t.name);
-                //Logger.log.Debug(t.GetType().ToString());
+                var logo = FindUnityObjectsHelper.GetAllGameObjectsInLoadedScenes().Find(x => x.name == "Logo");
 
-                if (t.name == "BATNeon" || t.name == "SaberNeon")
+                foreach (Transform t in logo.transform)
                 {
-                    var prePassLight = t.GetComponent<TubeBloomPrePassLight>();
+                    //Logger.log.Debug(t.name);
+                    //Logger.log.Debug(t.GetType().ToString());
 
-                    var lightType = prePassLight.GetBasePrivateField<BloomPrePassLightTypeSO>("_lightType");
-                    prePassLight.SetBasePrivateField("_registeredWithLightType", lightType);
+                    if (t.name == "BATNeon" || t.name == "SaberNeon")
+                    {
+                        var prePassLight = t.GetComponent<TubeBloomPrePassLight>();
 
-                    if (t.name == "BATNeon")
-                        prePassLight.color = cs.environmentColor0.ColorWithAlpha(prePassLight.color.a);
-                    if (t.name == "SaberNeon")
-                        prePassLight.color = cs.environmentColor1.ColorWithAlpha(prePassLight.color.a);
+                        var lightType = prePassLight.GetBasePrivateField<BloomPrePassLightTypeSO>("_lightType");
+                        prePassLight.SetBasePrivateField("_registeredWithLightType", lightType);
+
+                        if (t.name == "BATNeon")
+                            prePassLight.color = cs.environmentColor0.ColorWithAlpha(prePassLight.color.a);
+                        if (t.name == "SaberNeon")
+                            prePassLight.color = cs.environmentColor1.ColorWithAlpha(prePassLight.color.a);
+                    }
+
+                    if (t.name == "BatLogo" || t.name == "SaberLogo")
+                    {
+                        var sprite = t.GetComponent<SpriteRenderer>();
+
+                        if (t.name == "BatLogo")
+                            sprite.color = cs.environmentColor0.ColorWithAlpha(sprite.color.a);
+
+                        if (t.name == "SaberLogo")
+                            sprite.color = cs.environmentColor1.ColorWithAlpha(sprite.color.a);
+                    }
+
+                    if (t.name == "EFlickering")
+                    {
+                        var flicker = t.GetComponent<FlickeringNeonSign>();
+
+                        SetFlickeringNeonColor(flicker, cs.environmentColor0);
+                    }
                 }
 
-                if (t.name == "BatLogo" || t.name == "SaberLogo")
-                {
-                    var sprite = t.GetComponent<SpriteRenderer>();
-
-                    if (t.name == "BatLogo")
-                        sprite.color = cs.environmentColor0.ColorWithAlpha(sprite.color.a);
-
-                    if (t.name == "SaberLogo")
-                        sprite.color = cs.environmentColor1.ColorWithAlpha(sprite.color.a);
-                }
-
-                if (t.name == "EFlickering")
-                {
-                    var flicker = t.GetComponent<FlickeringNeonSign>();
-
-                    SetFlickeringNeonColor(flicker, cs.environmentColor0);
-                }
+                Logger.log.Info("applied Logo colors");
             }
-
-            Logger.log.Info("applied Logo colors");
+            catch (Exception e)
+            {
+                Logger.log.Error(e);
+            }
         }
 
         private static void SetMenuPlayersPlaceColors(ColorScheme cs)
         {
-            var menuPlayersPlace = FindUnityObjectsHelper.GetAllGameObjectsInLoadedScenes().Find(x => x.name == "MenuPlayersPlace");
-
-            foreach (Transform child in menuPlayersPlace.transform)
+            try
             {
-                if (child.name == "Feet")
-                {
-                    var sprite = child.GetComponent<SpriteRenderer>();
-                    sprite.color = cs.environmentColor1;
-                }
-                if (child.name == "RectangleFakeGlow")
-                {
-                    var fakeglow = child.GetComponent<RectangleFakeGlow>();
-                    fakeglow.color = cs.environmentColor1.ColorWithAlpha(0.5f);
-                }
-            }
+                var menuPlayersPlace = FindUnityObjectsHelper.GetAllGameObjectsInLoadedScenes().Find(x => x.name == "MenuPlayersPlace");
 
-            Logger.log.Info("applied PlayerPlace colors");
+                foreach (Transform child in menuPlayersPlace.transform)
+                {
+                    if (child.name == "Feet")
+                    {
+                        var sprite = child.GetComponent<SpriteRenderer>();
+                        sprite.color = cs.environmentColor1;
+                    }
+                    if (child.name == "RectangleFakeGlow")
+                    {
+                        var fakeglow = child.GetComponent<RectangleFakeGlow>();
+                        fakeglow.color = cs.environmentColor1.ColorWithAlpha(0.5f);
+                    }
+                }
+
+                Logger.log.Info("applied PlayerPlace colors");
+            }
+            catch (Exception e)
+            {
+                Logger.log.Error(e);
+            }
         }
 
         private static void SetColoredTextIconColors(ColorScheme cs)
         {
-            var coloredTextIcons = Resources.FindObjectsOfTypeAll<GameObject>()
-                .Where(obj => obj.GetComponent<SegmentedControlCell>() != null)
-                .Select(obj => obj.GetComponent<SegmentedControlCell>())
-                .ToArray();
-
-            foreach (var ct in coloredTextIcons)
+            try
             {
-                //Logger.log.Debug(ct.name);
-                Color c;
+                var coloredTextIcons = Resources.FindObjectsOfTypeAll<GameObject>()
+                    .Where(obj => obj.GetComponent<SegmentedControlCell>() != null)
+                    .Select(obj => obj.GetComponent<SegmentedControlCell>())
+                    .ToArray();
 
-                if (ct.GetType() == typeof(TextSegmentedControlCellNew))
+                foreach (var ct in coloredTextIcons)
                 {
-                    c = ct.GetPrivateField<Color>("_selectedTextColor");
-                    ct.SetPrivateField("_selectedTextColor", cs.environmentColor1.ColorWithAlpha(c.a));
-                    //c = cp.GetPrivateField<Color>("_highlightTextColor");
-                    //cp.SetPrivateField("_highlightTextColor", overrideColorScheme.environmentColor1);
-                    c = ct.GetPrivateField<Color>("_selectedHighlightTextColor");
-                    ct.SetPrivateField("_selectedHighlightTextColor", cs.environmentColor1.ColorWithAlpha(c.a));
+                    //Logger.log.Debug(ct.name);
+                    Color c;
+
+                    if (ct.GetType() == typeof(TextSegmentedControlCellNew))
+                    {
+                        c = ct.GetPrivateField<Color>("_selectedTextColor");
+                        ct.SetPrivateField("_selectedTextColor", cs.environmentColor1.ColorWithAlpha(c.a));
+                        //c = cp.GetPrivateField<Color>("_highlightTextColor");
+                        //cp.SetPrivateField("_highlightTextColor", overrideColorScheme.environmentColor1);
+                        c = ct.GetPrivateField<Color>("_selectedHighlightTextColor");
+                        ct.SetPrivateField("_selectedHighlightTextColor", cs.environmentColor1.ColorWithAlpha(c.a));
+                    }
+
+                    if (ct.GetType() == typeof(IconSegmentedControlCell))
+                    {
+                        c = ct.GetPrivateField<Color>("_selectedIconColor");
+                        ct.SetPrivateField("_selectedIconColor", cs.environmentColor1.ColorWithAlpha(c.a));
+                        //c = cp.GetPrivateField<Color>("_highlightIconColor");
+                        //cp.SetPrivateField("_highlightIconColor", overrideColorScheme.environmentColor1);
+                        c = ct.GetPrivateField<Color>("_selectedHighlightIconColor");
+                        ct.SetPrivateField("_selectedHighlightIconColor", cs.environmentColor1.ColorWithAlpha(c.a));
+                    }
+
+                    //c = cp.GetPrivateField<Color>("_selectedBGColor");
+                    //cp.SetPrivateField("_selectedBGColor", overrideColorScheme.environmentColor1);
+                    c = ct.GetPrivateField<Color>("_highlightBGColor");
+                    ct.SetPrivateField("_highlightBGColor", cs.environmentColor1.ColorWithAlpha(c.a));
+                    c = ct.GetPrivateField<Color>("_selectedHighlightBGColor");
+                    ct.SetPrivateField("_selectedHighlightBGColor", cs.environmentColor1.ColorWithAlpha(c.a));
+
+
+                    ct.InvokePrivateMethod("RefreshVisuals", new object[] { });
                 }
 
-                if (ct.GetType() == typeof(IconSegmentedControlCell))
-                {
-                    c = ct.GetPrivateField<Color>("_selectedIconColor");
-                    ct.SetPrivateField("_selectedIconColor", cs.environmentColor1.ColorWithAlpha(c.a));
-                    //c = cp.GetPrivateField<Color>("_highlightIconColor");
-                    //cp.SetPrivateField("_highlightIconColor", overrideColorScheme.environmentColor1);
-                    c = ct.GetPrivateField<Color>("_selectedHighlightIconColor");
-                    ct.SetPrivateField("_selectedHighlightIconColor", cs.environmentColor1.ColorWithAlpha(c.a));
-                }
-                
-                //c = cp.GetPrivateField<Color>("_selectedBGColor");
-                //cp.SetPrivateField("_selectedBGColor", overrideColorScheme.environmentColor1);
-                c = ct.GetPrivateField<Color>("_highlightBGColor");
-                ct.SetPrivateField("_highlightBGColor", cs.environmentColor1.ColorWithAlpha(c.a));
-                c = ct.GetPrivateField<Color>("_selectedHighlightBGColor");
-                ct.SetPrivateField("_selectedHighlightBGColor", cs.environmentColor1.ColorWithAlpha(c.a));
-
-
-                ct.InvokePrivateMethod("RefreshVisuals", new object[] { });
+                Logger.log.Info("applied Text and Icon colors");
             }
-
-            Logger.log.Info("applied Text and Icon colors");
+            catch (Exception e)
+            {
+                Logger.log.Error(e);
+            }
         }
 
         private static void SetColoredImageColors(ColorScheme cs)
         {
-            var coloredImages = Resources.FindObjectsOfTypeAll<UnityEngine.UI.Image>()
-                .Where(image => (image.name == "Arrow" || image.name == "Icon" || image.name == "Highlight" || image.name == "Checkmark" || image.name == "Selection" || image.name == "Handle" || image.name == "Glow")
-                                && image.color.ColorWithAlpha(1f) != Color.white && image.color.ColorWithAlpha(1f) != Color.black)
-                .ToArray();
-
-            foreach (var ci in coloredImages)
+            try
             {
-                ci.color = cs.environmentColor1.ColorWithAlpha(ci.color.a);
-            }
+                var coloredImages = Resources.FindObjectsOfTypeAll<UnityEngine.UI.Image>()
+                    .Where(image => (image.name == "Arrow" || image.name == "Icon" || image.name == "Highlight" || image.name == "Checkmark" || image.name == "Selection" || image.name == "Handle" || image.name == "Glow")
+                                    && image.color.ColorWithAlpha(1f) != Color.white && image.color.ColorWithAlpha(1f) != Color.black)
+                    .ToArray();
 
-            Logger.log.Info("applied Image colors");
+                foreach (var ci in coloredImages)
+                {
+                    ci.color = cs.environmentColor1.ColorWithAlpha(ci.color.a);
+                }
+
+                Logger.log.Info("applied Image colors");
+            }
+            catch (Exception e)
+            {
+                Logger.log.Error(e);
+            }
         }
 
         private static void SetPointerColors(ColorScheme cs)
         {
-            var pointer = Resources.FindObjectsOfTypeAll<VRPointer>().FirstOrDefault();
-            pointer.InvokePrivateMethod("DestroyLaserAndHit", Array.Empty<object>());
-            pointer.InvokePrivateMethod("CreateLaserPointerAndLaserHit", Array.Empty<object>());
-            Logger.log.Info("applied Pointer colors");
+            try
+            {
+                var pointer = Resources.FindObjectsOfTypeAll<VRPointer>().FirstOrDefault();
+                pointer.InvokePrivateMethod("DestroyLaserAndHit", Array.Empty<object>());
+                pointer.InvokePrivateMethod("CreateLaserPointerAndLaserHit", Array.Empty<object>());
+                Logger.log.Info("applied Pointer colors");
+            }
+            catch (Exception e)
+            {
+                Logger.log.Error(e);
+            }
         }
 
         private static void SetSliderColors(ColorScheme cs)
         {
-            var sliders = Resources.FindObjectsOfTypeAll<TextSlider>();
-            foreach (var slider in sliders)
+            try
             {
-                var cb = slider.colors;
-                cb.highlightedColor = cs.environmentColor1.ColorWithAlpha(cb.highlightedColor.a);
-                cb.pressedColor = cs.environmentColor1.ColorWithAlpha(cb.highlightedColor.a);
-                slider.colors = cb;
+                var sliders = Resources.FindObjectsOfTypeAll<TextSlider>();
+                foreach (var slider in sliders)
+                {
+                    var cb = slider.colors;
+                    cb.highlightedColor = cs.environmentColor1.ColorWithAlpha(cb.highlightedColor.a);
+                    cb.pressedColor = cs.environmentColor1.ColorWithAlpha(cb.highlightedColor.a);
+                    slider.colors = cb;
+                }
+                Logger.log.Info("applied Slider colors");
             }
-            Logger.log.Info("applied Slider colors");
+            catch (Exception e)
+            {
+                Logger.log.Error(e);
+            }
         }
 
         private static void SetToggleColors(ColorScheme cs)
         {
-            var toggles = Resources.FindObjectsOfTypeAll<Toggle>()
-                .Where(x => (x.image.name == "BG" || x.image.name == "Background") && x.transform.parent.parent?.name != "LevelDetail(Clone)").ToArray();
-            foreach (var toggle in toggles)
+            try
             {
-                var cb = toggle.colors;
-                cb.highlightedColor = cs.environmentColor1.ColorWithAlpha(cb.highlightedColor.a);
-                cb.pressedColor = cs.environmentColor1.ColorWithAlpha(cb.highlightedColor.a);
-                toggle.colors = cb;
+                var toggles = Resources.FindObjectsOfTypeAll<Toggle>()
+                    .Where(x => (x.image.name == "BG" || x.image.name == "Background") && x.transform.parent.parent?.name != "LevelDetail(Clone)").ToArray();
+                foreach (var toggle in toggles)
+                {
+                    var cb = toggle.colors;
+                    cb.highlightedColor = cs.environmentColor1.ColorWithAlpha(cb.highlightedColor.a);
+                    cb.pressedColor = cs.environmentColor1.ColorWithAlpha(cb.highlightedColor.a);
+                    toggle.colors = cb;
+                }
+                Logger.log.Info("applied Toggle colors");
             }
-            Logger.log.Info("applied Toggle colors");
+            catch (Exception e)
+            {
+                Logger.log.Error(e);
+            }
         }
 
         private static void SetAnimationClipColors(ColorScheme cs)
         {
-            var animationClips = Resources.FindObjectsOfTypeAll<AnimationClip>().Where(x => x.name.Contains("Highlight")).ToArray();
-            foreach (var animationClip in animationClips)
+            try
             {
-                Utils.SetAnimationCurveColor(animationClip, cs.environmentColor1, typeof(UnityEngine.UI.Image), "m_Color", "BG");
+                var animationClips = Resources.FindObjectsOfTypeAll<AnimationClip>().Where(x => x.name.Contains("Highlight")).ToArray();
+                foreach (var animationClip in animationClips)
+                {
+                    Utils.SetAnimationCurveColor(animationClip, cs.environmentColor1, typeof(UnityEngine.UI.Image), "m_Color", "BG");
+                }
+                Logger.log.Info("applied AnimationClip colors");
             }
-            Logger.log.Info("applied AnimationClip colors");
+            catch (Exception e)
+            {
+                Logger.log.Error(e);
+            }
         }
 
         private static void SetButtonColors(ColorScheme cs)
         {
-            var buttons = Resources.FindObjectsOfTypeAll<Button>().Where(x => x.transition != Selectable.Transition.None).ToArray();
-            foreach (var button in buttons)
+            try
             {
-                var cb = button.colors;
-                cb.highlightedColor = cs.environmentColor1.ColorWithAlpha(cb.highlightedColor.a);
-                cb.pressedColor = cs.environmentColor1.ColorWithAlpha(cb.pressedColor.a);
-                button.colors = cb;
+                var buttons = Resources.FindObjectsOfTypeAll<Button>().Where(x => x.transition != Selectable.Transition.None).ToArray();
+                foreach (var button in buttons)
+                {
+                    var cb = button.colors;
+                    cb.highlightedColor = cs.environmentColor1.ColorWithAlpha(cb.highlightedColor.a);
+                    cb.pressedColor = cs.environmentColor1.ColorWithAlpha(cb.pressedColor.a);
+                    button.colors = cb;
+                }
+                Logger.log.Info("applied Button colors");
             }
-            Logger.log.Info("applied Button colors");
+            catch (Exception e)
+            {
+                Logger.log.Error(e);
+            }
         }
 
         private static void SetTMPUGUIColors(ColorScheme cs)
         {
-            var TMPUGUIes = Resources.FindObjectsOfTypeAll<TextMeshProUGUI>()
-            .Where(x => x.color.ColorWithAlpha(1f) != Color.white && x.color.ColorWithAlpha(1f) != Color.black)
-            .Where(y => y.name == "ScoreText" || y.name == "RankText" || y.transform.parent?.name == "DropDown" || y.transform.parent?.name == "HeaderPanel")
-            .ToArray();
-            foreach (var TMPUGUI in TMPUGUIes)
+            try
             {
-                TMPUGUI.color = cs.environmentColor1.ColorWithAlpha(TMPUGUI.color.a);
-
-                if (TMPUGUI.transform.parent.name == "HeaderPanel")
+                var TMPUGUIes = Resources.FindObjectsOfTypeAll<TextMeshProUGUI>()
+                .Where(x => x.color.ColorWithAlpha(1f) != Color.white && x.color.ColorWithAlpha(1f) != Color.black)
+                .Where(y => y.name == "ScoreText" || y.name == "RankText" || y.transform.parent?.name == "DropDown" || y.transform.parent?.name == "HeaderPanel")
+                .ToArray();
+                foreach (var TMPUGUI in TMPUGUIes)
                 {
-                    //TMPUGUI.color = cs.environmentColor1.makeLight(0.294f).ColorWithAlpha(TMPUGUI.color.a);
                     TMPUGUI.color = cs.environmentColor1.ColorWithAlpha(TMPUGUI.color.a);
+
+                    if (TMPUGUI.transform.parent.name == "HeaderPanel")
+                    {
+                        //TMPUGUI.color = cs.environmentColor1.makeLight(0.294f).ColorWithAlpha(TMPUGUI.color.a);
+                        TMPUGUI.color = cs.environmentColor1.ColorWithAlpha(TMPUGUI.color.a);
+                    }
+
                 }
-                    
+                Logger.log.Info("applied TextMeshProUGUI colors");
             }
-            Logger.log.Info("applied TextMeshProUGUI colors");
+            catch (Exception e)
+            {
+                Logger.log.Error(e);
+            }
         }
 
         private static void SetMissionToggleColors(ColorScheme cs)
         {
-            var missionToggles = Resources.FindObjectsOfTypeAll<MissionToggle>();
-            foreach (var missionToggle in missionToggles)
+            try
             {
-                missionToggle.SetPrivateField("_highlightColor", cs.environmentColor1);
+                var missionToggles = Resources.FindObjectsOfTypeAll<MissionToggle>();
+                foreach (var missionToggle in missionToggles)
+                {
+                    missionToggle.SetPrivateField("_highlightColor", cs.environmentColor1);
+                }
+                Logger.log.Info("applied MissionToggle colors");
             }
-            Logger.log.Info("applied MissionToggle colors");
+            catch (Exception e)
+            {
+                Logger.log.Error(e);
+            }
         }
 
         private static void SetTableCellColors(ColorScheme cs)
         {
-            var tableCells = Resources.FindObjectsOfTypeAll<TableCell>().Where(x => x.ContainPrivateField<Color>("_selectedHighlightElementsColor")).ToArray();
-            foreach (var tableCell in tableCells)
+            try
             {
-                tableCell.SetPrivateField("_selectedHighlightElementsColor", cs.environmentColor1);
+                var tableCells = Resources.FindObjectsOfTypeAll<TableCell>().Where(x => x.ContainPrivateField<Color>("_selectedHighlightElementsColor")).ToArray();
+                foreach (var tableCell in tableCells)
+                {
+                    tableCell.SetPrivateField("_selectedHighlightElementsColor", cs.environmentColor1);
+                }
+                Logger.log.Info("applied TableCell colors");
             }
-            Logger.log.Info("applied TableCell colors");
+            catch (Exception e)
+            {
+                Logger.log.Error(e);
+            }
         }
 
         private static void SetFireWorkColors(ColorScheme cs)
         {
-            var fireWorkItemControllers = Resources.FindObjectsOfTypeAll<FireworkItemController>();
-            foreach (var fireworks in fireWorkItemControllers)
+            try
             {
-                fireworks.SetPrivateField("_lightsColor", cs.environmentColor1);
-                var particle = fireworks.GetPrivateField<ParticleSystem>("_particleSystem");
+                var fireWorkItemControllers = Resources.FindObjectsOfTypeAll<FireworkItemController>();
+                foreach (var fireworks in fireWorkItemControllers)
+                {
+                    fireworks.SetPrivateField("_lightsColor", cs.environmentColor1);
+                    var particle = fireworks.GetPrivateField<ParticleSystem>("_particleSystem");
 
-                var main = particle.main;
-                main.startColor = new ParticleSystem.MinMaxGradient(main.startColor.colorMin, cs.environmentColor1);
+                    var main = particle.main;
+                    main.startColor = new ParticleSystem.MinMaxGradient(main.startColor.colorMin, cs.environmentColor1);
+                }
+                Logger.log.Info("applied Firework colors");
             }
-            Logger.log.Info("applied Firework colors");
+            catch (Exception e)
+            {
+                Logger.log.Error(e);
+            }
         }
 
         public static void ChangeColors()
@@ -421,6 +518,6 @@ namespace MenuLightColorChanger
             currentColorScheme = overrideColorScheme;
 
             Logger.log.Info("applied all colors");
-        }       
+        }
     }
 }
