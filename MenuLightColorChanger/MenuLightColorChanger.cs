@@ -265,7 +265,7 @@ namespace MenuLightColorChanger
                     ct.SetPrivateField("_selectedHighlightBGColor", cs.environmentColor1.ColorWithAlpha(c.a));
 
 
-                    ct.InvokePrivateMethod("RefreshVisuals", new object[] { });
+                    ct.InvokeMethod("RefreshVisuals", new object[] { });
                 }
 
                 Plugin.Logger.Info("applied Text and Icon colors");
@@ -303,8 +303,8 @@ namespace MenuLightColorChanger
             try
             {
                 var pointer = Resources.FindObjectsOfTypeAll<VRPointer>().FirstOrDefault();
-                pointer.InvokePrivateMethod("DestroyLaserAndHit", Array.Empty<object>());
-                pointer.InvokePrivateMethod("CreateLaserPointerAndLaserHit", Array.Empty<object>());
+                pointer.DestroyLaserAndHit();
+                pointer.CreateLaserPointerAndLaserHit();
                 Plugin.Logger.Info("applied Pointer colors");
             }
             catch (Exception e)
