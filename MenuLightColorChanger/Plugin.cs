@@ -1,95 +1,70 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
+﻿using BS_Utils.Utilities;
+using HarmonyLib;
 using IPA;
-using IPA.Config;
-using IPA.Utilities;
-using Harmony;
+using IPA.Logging;
+using System;
+using System.Reflection;
 using UnityEngine.SceneManagement;
-using UnityEngine;
-using IPALogger = IPA.Logging.Logger;
-using BS_Utils.Utilities;
 
 namespace MenuLightColorChanger
 {
-    public class Plugin : IBeatSaberPlugin
+    [Plugin(RuntimeOptions.SingleStartInit)]
+    public class Plugin
     {
-        public const string HarmonyId = "com.github.kurenai3110.MenuLightColorChanger";
-        internal static HarmonyInstance harmony;
-        internal static string Name => "MenuLightColorChanger";
-        internal static Ref<PluginConfig> config;
-        internal static IConfigProvider configProvider;
+        private const string harmonyId = "com.github.kurenai3110.MenuLightColorChanger";
+        public static IPA.Logging.Logger Logger { get; private set; }
 
-        public void Init(IPALogger logger, [IPA.Config.Config.Prefer("json")] IConfigProvider cfgProvider)
+        private Harmony harmony;
+
+        [Init]
+        public void Init(IPA.Logging.Logger logger)
         {
-            Logger.log = logger;
-            Logger.log.Debug("Logger initialized.");
-
-            configProvider = cfgProvider;
-
-            config = configProvider.MakeLink<PluginConfig>((p, v) =>
-            {
-                // Build new config file if it doesn't exist or RegenerateConfig is true
-                if (v.Value == null || v.Value.RegenerateConfig)
-                {
-                    Logger.log.Debug("Regenerating PluginConfig");
-                    p.Store(v.Value = new PluginConfig()
-                    {
-                        // Set your default settings here.
-                        RegenerateConfig = false
-                    });
-                }
-                config = v;
-            });
-            harmony = HarmonyInstance.Create(HarmonyId);
-
-            ApplyHarmonyPatches();
+            Logger = logger;
         }
+
+        [OnStart]
+        public void OnApplicationStart()
+        {
+            SceneManager.activeSceneChanged += OnActiveSceneChanged;
+            this.ApplyHarmonyPatches();
+            BSEvents.OnLoad();
+            BSEvents.menuSceneLoadedFresh += MenuSceneLoadedFresh;
+        }
+
 
         /// <summary>
         /// Attempts to apply all the Harmony patches in this assembly.
         /// </summary>
-        public static void ApplyHarmonyPatches()
+        public void ApplyHarmonyPatches()
         {
             try
             {
-                Logger.log.Debug("Applying Harmony patches.");
-                harmony.PatchAll(Assembly.GetExecutingAssembly());
+                Logger.Debug("Applying Harmony patches.");
+                this.harmony = new Harmony(harmonyId);
+                this.harmony.PatchAll(Assembly.GetExecutingAssembly());
             }
             catch (Exception ex)
             {
-                Logger.log.Critical("Error applying Harmony patches: " + ex.Message);
-                Logger.log.Debug(ex);
+                Logger.Critical("Error applying Harmony patches: " + ex.Message);
+                Logger.Debug(ex);
             }
         }
 
         /// <summary>
         /// Attempts to remove all the Harmony patches that used our HarmonyId.
         /// </summary>
-        public static void RemoveHarmonyPatches()
+        public void RemoveHarmonyPatches()
         {
             try
             {
                 // Removes all patches with this HarmonyId
-                harmony.UnpatchAll(HarmonyId);
+                this.harmony.UnpatchAll(harmonyId);
             }
             catch (Exception ex)
             {
-                Logger.log.Critical("Error removing Harmony patches: " + ex.Message);
-                Logger.log.Debug(ex);
+                Logger.Critical("Error removing Harmony patches: " + ex.Message);
+                Logger.Debug(ex);
             }
-        }
-
-        /// <summary>
-        /// Called when the active scene is changed.
-        /// </summary>
-        /// <param name="prevScene">The scene you are transitioning from.</param>
-        /// <param name="nextScene">The scene you are transitioning to.</param>
-        public void OnActiveSceneChanged(Scene prevScene, Scene nextScene)
-        {
-
         }
 
         /// <summary>
@@ -97,53 +72,12 @@ namespace MenuLightColorChanger
         /// </summary>
         /// <param name="scene"></param>
         /// <param name="sceneMode"></param>
-        public void OnSceneLoaded(Scene scene, LoadSceneMode sceneMode)
+        public void OnActiveSceneChanged(Scene prevScene, Scene nextScene)
         {
-            if(scene.name == "HealthWarning")
+            if (nextScene.name == "HealthWarning")
             {
                 MenuLightColorChanger.ChangeColors();
             }
-        }
-
-
-        public void OnApplicationQuit()
-        {
-            Logger.log.Debug("OnApplicationQuit");
-
-            BSEvents.menuSceneLoadedFresh -= MenuSceneLoadedFresh;
-        }
-
-        /// <summary>
-        /// Runs at a fixed intervalue, generally used for physics calculations. 
-        /// </summary>
-        public void OnFixedUpdate()
-        {
-
-        }
-
-        /// <summary>
-        /// This is called every frame.
-        /// </summary>
-        public void OnUpdate()
-        {
-
-        }
-
-
-        public void OnSceneUnloaded(Scene scene)
-        {
-
-        }
-
-
-        /// <summary>
-        /// This should not be used with an IDisablable plugin. 
-        /// It will not be called if the plugin starts disabled and is enabled while the game is running.
-        /// </summary>
-        public void OnApplicationStart()
-        {
-            BSEvents.OnLoad();
-            BSEvents.menuSceneLoadedFresh += MenuSceneLoadedFresh;
         }
 
         private void MenuSceneLoadedFresh()

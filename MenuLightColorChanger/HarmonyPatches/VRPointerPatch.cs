@@ -1,12 +1,6 @@
 ﻿using BS_Utils.Utilities;
-using Harmony;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using HarmonyLib;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using VRUIControls;
 
 namespace MenuLightColorChanger.HarmonyPatches
@@ -36,7 +30,7 @@ namespace MenuLightColorChanger.HarmonyPatches
                 cursor.material.color = cs.saberAColor.ColorWithAlpha(cursor.material.color.a);
             }
 
-            Logger.log.Info("applied pointer colors");
+            Plugin.Logger.Info("applied pointer colors");
 
             return true;
         }
@@ -48,7 +42,7 @@ namespace MenuLightColorChanger.HarmonyPatches
     {
         static void Postfix(ref VRController ____leftVRController, ref bool ____lastControllerUsedWasRight)
         {
-            if(____leftVRController.active == false)
+            if (____leftVRController.active == false)
             {
                 ____lastControllerUsedWasRight = true;
             }

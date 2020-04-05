@@ -3,11 +3,12 @@
   "id": "MenuLightColorChanger",
   "name": "MenuLightColorChanger",
   "author": "kurenai3110",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "",
-  "gameVersion": "1.7.0",
+  "gameVersion": "1.8.0",
   "dependsOn": {
-
+    "BSIPA": "^4.0.3",
+    "BS Utils": "^1.4.8"
   },
   "features": []
 }

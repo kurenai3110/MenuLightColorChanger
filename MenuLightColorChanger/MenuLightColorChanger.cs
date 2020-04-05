@@ -2,10 +2,7 @@
 using HMUI;
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -90,7 +87,7 @@ namespace MenuLightColorChanger
             GameObject.DestroyImmediate(editButtonObject.GetComponents<HoverHint>().Last());
 
             isInited = true;
-            Logger.log.Info("initialized!");
+            Plugin.Logger.Info("initialized!");
         }
 
         private static void SetMenuEnvironmentColors(ColorScheme cs)
@@ -103,12 +100,12 @@ namespace MenuLightColorChanger
                     menuEnvLight3.SetColor(cs.environmentColor1);
                 if (menuEnvLight1 != null)
                     menuEnvLight1.SetColor(cs.environmentColor0);
-                Logger.log.Info("applied Environment colors");
+                Plugin.Logger.Info("applied Environment colors");
 
             }
             catch (Exception e)
             {
-                Logger.log.Error(e);
+                Plugin.Logger.Error(e);
             }
         }
 
@@ -143,7 +140,7 @@ namespace MenuLightColorChanger
             }
             catch (Exception e)
             {
-                Logger.log.Error(e);
+                Plugin.Logger.Error(e);
             }
         }
 
@@ -155,8 +152,8 @@ namespace MenuLightColorChanger
 
                 foreach (Transform t in logo.transform)
                 {
-                    //Logger.log.Debug(t.name);
-                    //Logger.log.Debug(t.GetType().ToString());
+                    //Plugin.Logger.Debug(t.name);
+                    //Plugin.Logger.Debug(t.GetType().ToString());
 
                     if (t.name == "BATNeon" || t.name == "SaberNeon")
                     {
@@ -190,11 +187,11 @@ namespace MenuLightColorChanger
                     }
                 }
 
-                Logger.log.Info("applied Logo colors");
+                Plugin.Logger.Info("applied Logo colors");
             }
             catch (Exception e)
             {
-                Logger.log.Error(e);
+                Plugin.Logger.Error(e);
             }
         }
 
@@ -218,11 +215,11 @@ namespace MenuLightColorChanger
                     }
                 }
 
-                Logger.log.Info("applied PlayerPlace colors");
+                Plugin.Logger.Info("applied PlayerPlace colors");
             }
             catch (Exception e)
             {
-                Logger.log.Error(e);
+                Plugin.Logger.Error(e);
             }
         }
 
@@ -237,7 +234,7 @@ namespace MenuLightColorChanger
 
                 foreach (var ct in coloredTextIcons)
                 {
-                    //Logger.log.Debug(ct.name);
+                    //Plugin.Logger.Debug(ct.name);
                     Color c;
 
                     if (ct.GetType() == typeof(TextSegmentedControlCellNew))
@@ -271,11 +268,11 @@ namespace MenuLightColorChanger
                     ct.InvokePrivateMethod("RefreshVisuals", new object[] { });
                 }
 
-                Logger.log.Info("applied Text and Icon colors");
+                Plugin.Logger.Info("applied Text and Icon colors");
             }
             catch (Exception e)
             {
-                Logger.log.Error(e);
+                Plugin.Logger.Error(e);
             }
         }
 
@@ -293,11 +290,11 @@ namespace MenuLightColorChanger
                     ci.color = cs.environmentColor1.ColorWithAlpha(ci.color.a);
                 }
 
-                Logger.log.Info("applied Image colors");
+                Plugin.Logger.Info("applied Image colors");
             }
             catch (Exception e)
             {
-                Logger.log.Error(e);
+                Plugin.Logger.Error(e);
             }
         }
 
@@ -308,11 +305,11 @@ namespace MenuLightColorChanger
                 var pointer = Resources.FindObjectsOfTypeAll<VRPointer>().FirstOrDefault();
                 pointer.InvokePrivateMethod("DestroyLaserAndHit", Array.Empty<object>());
                 pointer.InvokePrivateMethod("CreateLaserPointerAndLaserHit", Array.Empty<object>());
-                Logger.log.Info("applied Pointer colors");
+                Plugin.Logger.Info("applied Pointer colors");
             }
             catch (Exception e)
             {
-                Logger.log.Error(e);
+                Plugin.Logger.Error(e);
             }
         }
 
@@ -328,11 +325,11 @@ namespace MenuLightColorChanger
                     cb.pressedColor = cs.environmentColor1.ColorWithAlpha(cb.highlightedColor.a);
                     slider.colors = cb;
                 }
-                Logger.log.Info("applied Slider colors");
+                Plugin.Logger.Info("applied Slider colors");
             }
             catch (Exception e)
             {
-                Logger.log.Error(e);
+                Plugin.Logger.Error(e);
             }
         }
 
@@ -349,11 +346,11 @@ namespace MenuLightColorChanger
                     cb.pressedColor = cs.environmentColor1.ColorWithAlpha(cb.highlightedColor.a);
                     toggle.colors = cb;
                 }
-                Logger.log.Info("applied Toggle colors");
+                Plugin.Logger.Info("applied Toggle colors");
             }
             catch (Exception e)
             {
-                Logger.log.Error(e);
+                Plugin.Logger.Error(e);
             }
         }
 
@@ -366,11 +363,11 @@ namespace MenuLightColorChanger
                 {
                     Utils.SetAnimationCurveColor(animationClip, cs.environmentColor1, typeof(UnityEngine.UI.Image), "m_Color", "BG");
                 }
-                Logger.log.Info("applied AnimationClip colors");
+                Plugin.Logger.Info("applied AnimationClip colors");
             }
             catch (Exception e)
             {
-                Logger.log.Error(e);
+                Plugin.Logger.Error(e);
             }
         }
 
@@ -386,11 +383,11 @@ namespace MenuLightColorChanger
                     cb.pressedColor = cs.environmentColor1.ColorWithAlpha(cb.pressedColor.a);
                     button.colors = cb;
                 }
-                Logger.log.Info("applied Button colors");
+                Plugin.Logger.Info("applied Button colors");
             }
             catch (Exception e)
             {
-                Logger.log.Error(e);
+                Plugin.Logger.Error(e);
             }
         }
 
@@ -413,11 +410,11 @@ namespace MenuLightColorChanger
                     }
 
                 }
-                Logger.log.Info("applied TextMeshProUGUI colors");
+                Plugin.Logger.Info("applied TextMeshProUGUI colors");
             }
             catch (Exception e)
             {
-                Logger.log.Error(e);
+                Plugin.Logger.Error(e);
             }
         }
 
@@ -430,11 +427,11 @@ namespace MenuLightColorChanger
                 {
                     missionToggle.SetPrivateField("_highlightColor", cs.environmentColor1);
                 }
-                Logger.log.Info("applied MissionToggle colors");
+                Plugin.Logger.Info("applied MissionToggle colors");
             }
             catch (Exception e)
             {
-                Logger.log.Error(e);
+                Plugin.Logger.Error(e);
             }
         }
 
@@ -447,11 +444,11 @@ namespace MenuLightColorChanger
                 {
                     tableCell.SetPrivateField("_selectedHighlightElementsColor", cs.environmentColor1);
                 }
-                Logger.log.Info("applied TableCell colors");
+                Plugin.Logger.Info("applied TableCell colors");
             }
             catch (Exception e)
             {
-                Logger.log.Error(e);
+                Plugin.Logger.Error(e);
             }
         }
 
@@ -468,11 +465,11 @@ namespace MenuLightColorChanger
                     var main = particle.main;
                     main.startColor = new ParticleSystem.MinMaxGradient(main.startColor.colorMin, cs.environmentColor1);
                 }
-                Logger.log.Info("applied Firework colors");
+                Plugin.Logger.Info("applied Firework colors");
             }
             catch (Exception e)
             {
-                Logger.log.Error(e);
+                Plugin.Logger.Error(e);
             }
         }
 
@@ -480,7 +477,7 @@ namespace MenuLightColorChanger
         {
             colorManager = Resources.FindObjectsOfTypeAll<ColorManager>().FirstOrDefault();
 
-            var playerDataModel = Resources.FindObjectsOfTypeAll<PlayerDataModelSO>().FirstOrDefault();
+            var playerDataModel = Resources.FindObjectsOfTypeAll<PlayerDataModel>().FirstOrDefault();
             colorSchemesSettings = playerDataModel.playerData.colorSchemesSettings;
 
             menuLightsManager = Resources.FindObjectsOfTypeAll<MenuLightsManager>().FirstOrDefault();
@@ -489,7 +486,7 @@ namespace MenuLightColorChanger
             var overrideColorScheme = colorSchemesSettings.overrideDefaultColors ? colorSchemesSettings.GetSelectedColorScheme() : colorManager.GetField<ColorSchemeSO>("_defaultColorScheme").colorScheme;
             Utils.AdjustColorBW(overrideColorScheme);
 
-            Logger.log.Info("selected:" + overrideColorScheme.colorSchemeName);
+            Plugin.Logger.Info("selected:" + overrideColorScheme.colorSchemeName);
 
             colorManager.SetPrivateField("_colorScheme", overrideColorScheme);
 
@@ -517,7 +514,7 @@ namespace MenuLightColorChanger
 
             currentColorScheme = overrideColorScheme;
 
-            Logger.log.Info("applied all colors");
+            Plugin.Logger.Info("applied all colors");
         }
     }
 }
